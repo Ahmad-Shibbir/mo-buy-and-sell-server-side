@@ -20,7 +20,15 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run(){
     try{
         const categoryCollection = client.db('mo-buy&sell').collection('cetegory');
+        const orderCollection = client.db('mo-buy&sell').collection('orders');
 
+        app.get('/order',async(req, res)=>{
+            const email = req.query.email;
+            console.log(email);
+            const query = {email: email};        
+            const orderForOneCus = await orderCollection.find(query).toArray();
+            res.send(orderForOneCus);
+        })
         app.get('/category',async(req,res)=>{
             const query = {};
            const categories = await categoryCollection.find(query).toArray(); 
