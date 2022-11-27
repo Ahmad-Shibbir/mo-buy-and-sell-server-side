@@ -62,6 +62,19 @@ async function run(){
 
         })
 
+        app.get('/users/admin/:email', async(req, res)=>{
+            const email = req.params.email;
+            const query={email};
+            const user = await userCollection.findOne(query);
+            res.send({isAdmin: user?.user_type === 'admin'});
+        })
+
+        app.get('/users', async(req,res)=>{
+            const query = {};
+            const result = await userCollection.find(query).toArray();
+            res.send(result);
+        })
+
         app.get('/jwt', async(req, res)=>{
             const email = req.query.email;
             const query= {email: email};
