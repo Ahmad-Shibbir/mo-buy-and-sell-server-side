@@ -41,6 +41,7 @@ async function run(){
         const orderCollection = client.db('mo-buy&sell').collection('orders');
         const userCollection = client.db('mo-buy&sell').collection('users');
         const productCollection = client.db('mo-buy&sell').collection('product');
+        const bookingsCollection = client.db('mo-buy&sell').collection('bookings');
 
         app.get('/order',verifyJWT,async(req, res)=>{
             const email = req.query.email;
@@ -53,9 +54,25 @@ async function run(){
 
             console.log(email);
             const query = {email: email};        
-            const orderForOneCus = await orderCollection.find(query).toArray();
+            const orderForOneCus = await bookingsCollection.find(query).toArray();
             res.send(orderForOneCus);
         })
+
+        app.get('/my-products',verifyJWT,async(req, res)=>{
+            const email = req.query.email;
+            // console.log('token', req.headers.authorization);
+            const decodedEmail = req.decoded.email;
+
+            if(email != decodedEmail){
+                return res.status(403).send({message: "forbidden access"})
+            }
+            console.log(email);
+            const query = {email: email};        
+            const sellerProducts = await productCollection.find(query).toArray();
+            res.send(sellerProducts);
+        })
+
+
         app.get('/category',async(req,res)=>{
             const query = {};
            const categories = await categoryCollection.find(query).toArray(); 
@@ -89,8 +106,23 @@ async function run(){
             res.send({isBuyer: user?.user_type === 'buyer'});
         })
 
+        // app.get('/my-products/:email', async(req, res)=>{
+        //     const email = req.params.email;
+        //     const query={email};
+        //     const products = await productCollection.find(query).toArray();
+        //     res.send(products)
+        //     // res.send({isBuyer: user?.user_type === 'buyer'});
+        // })
+
         app.get('/users', async(req,res)=>{
             const query = {};
+            const result = await userCollection.find(query).toArray();
+            res.send(result);
+        })
+        app.get('/all-seller/:user_type', async(req,res)=>{
+            const user_type = req.params.user_type;
+            // console.log( user_type : user_type);
+            const query = {user_type: user_type};
             const result = await userCollection.find(query).toArray();
             res.send(result);
         })
@@ -116,6 +148,20 @@ async function run(){
             const product = req.body;
             const result = await productCollection.insertOne(product);
             res.send(result);
+        })
+        app.post('/bookings',async(req,res)=>{
+            const product = req.body;
+            const result = await bookingsCollection.insertOne(product);
+            res.send(result);
+        })
+
+        app.delete('/user/:id', async(req,res)=>{
+            const id = req.params.id;
+            console.log(id);
+            const filter = {_id: ObjectId(id)};
+            const result = await userCollection.deleteOne(filter);
+            res.send(result);
+
         })
 
     }
