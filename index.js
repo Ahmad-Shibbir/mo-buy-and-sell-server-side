@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const {MongoClient, ServerApiVersion}= require('mongodb');
+const {MongoClient, ServerApiVersion, ObjectId}= require('mongodb');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
@@ -40,6 +40,7 @@ async function run(){
         const categoryCollection = client.db('mo-buy&sell').collection('cetegory');
         const orderCollection = client.db('mo-buy&sell').collection('orders');
         const userCollection = client.db('mo-buy&sell').collection('users');
+        const productCollection = client.db('mo-buy&sell').collection('product');
 
         app.get('/order',verifyJWT,async(req, res)=>{
             const email = req.query.email;
@@ -60,6 +61,13 @@ async function run(){
            const categories = await categoryCollection.find(query).toArray(); 
            res.send(categories);
 
+        })
+
+        app.get('/category/:id', async(req, res)=>{
+            const id = req.params.id;
+            const query={category_id:id};
+            const products = await productCollection.find(query).toArray();
+            res.send(products)
         })
 
         app.get('/users/admin/:email', async(req, res)=>{
@@ -101,6 +109,12 @@ async function run(){
         app.post('/users', async(req,res)=>{
             const user = req.body;
             const result = await userCollection.insertOne(user);
+            res.send(result);
+        })
+
+        app.post('/products',async(req,res)=>{
+            const product = req.body;
+            const result = await productCollection.insertOne(product);
             res.send(result);
         })
 
