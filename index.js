@@ -42,6 +42,7 @@ async function run(){
         const userCollection = client.db('mo-buy&sell').collection('users');
         const productCollection = client.db('mo-buy&sell').collection('product');
         const bookingsCollection = client.db('mo-buy&sell').collection('bookings');
+        const advertiseCollection = client.db('mo-buy&sell').collection('advertise');
 
         app.get('/order',verifyJWT,async(req, res)=>{
             const email = req.query.email;
@@ -119,6 +120,11 @@ async function run(){
             const result = await userCollection.find(query).toArray();
             res.send(result);
         })
+        app.get('/advertise', async(req,res)=>{
+            const query = {};
+            const result = await advertiseCollection.find(query).toArray();
+            res.send(result);
+        })
         app.get('/all-seller/:user_type', async(req,res)=>{
             const user_type = req.params.user_type;
             // console.log( user_type : user_type);
@@ -138,6 +144,9 @@ async function run(){
             res.status(403).send({accessToken: ''})
         })
 
+
+
+        
         app.post('/users', async(req,res)=>{
             const user = req.body;
             const result = await userCollection.insertOne(user);
@@ -154,12 +163,27 @@ async function run(){
             const result = await bookingsCollection.insertOne(product);
             res.send(result);
         })
+        app.post('/advertise',async(req,res)=>{
+            const product = req.body;
+            const result = await advertiseCollection.insertOne(product);
+            res.send(result);
+        })
+
+
 
         app.delete('/user/:id', async(req,res)=>{
             const id = req.params.id;
             console.log(id);
             const filter = {_id: ObjectId(id)};
             const result = await userCollection.deleteOne(filter);
+            res.send(result);
+
+        })
+        app.delete('/products/:id', async(req,res)=>{
+            const id = req.params.id;
+            console.log(id);
+            const filter = {_id: ObjectId(id)};
+            const result = await productCollection.deleteOne(filter);
             res.send(result);
 
         })
