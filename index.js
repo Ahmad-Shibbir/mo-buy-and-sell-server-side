@@ -44,33 +44,49 @@ async function run(){
         const bookingsCollection = client.db('mo-buy&sell').collection('bookings');
         const advertiseCollection = client.db('mo-buy&sell').collection('advertise');
 
-        app.get('/order',verifyJWT,async(req, res)=>{
+        // app.get('/order',verifyJWT,async(req, res)=>{
+        //     const email = req.query.email;
+        //     // console.log('token', req.headers.authorization);
+        //     const decodedEmail = req.decoded.email;
+
+        //     if(email != decodedEmail){
+        //         return res.status(403).send({message: "forbidden access"})
+        //     }
+
+        //     console.log(email);
+        //     const query = {email: email};        
+        //     const orderForOneCus = await bookingsCollection.find(query).toArray();
+        //     res.send(orderForOneCus);
+        // })
+
+        app.get('/order',async(req,res)=>{
             const email = req.query.email;
-            // console.log('token', req.headers.authorization);
-            const decodedEmail = req.decoded.email;
+            const query = {email};
+           const categories = await bookingsCollection.find(query).toArray(); 
+           res.send(categories);
 
-            if(email != decodedEmail){
-                return res.status(403).send({message: "forbidden access"})
-            }
-
-            console.log(email);
-            const query = {email: email};        
-            const orderForOneCus = await bookingsCollection.find(query).toArray();
-            res.send(orderForOneCus);
         })
 
-        app.get('/my-products',verifyJWT,async(req, res)=>{
-            const email = req.query.email;
-            // console.log('token', req.headers.authorization);
-            const decodedEmail = req.decoded.email;
+        // app.get('/my-products',verifyJWT,async(req, res)=>{
+        //     const email = req.query.email;
+        //     // console.log('token', req.headers.authorization);
+        //     const decodedEmail = req.decoded.email;
 
-            if(email != decodedEmail){
-                return res.status(403).send({message: "forbidden access"})
-            }
-            console.log(email);
-            const query = {email: email};        
-            const sellerProducts = await productCollection.find(query).toArray();
-            res.send(sellerProducts);
+        //     if(email != decodedEmail){
+        //         return res.status(403).send({message: "forbidden access"})
+        //     }
+        //     console.log(email);
+        //     const query = {email: email};        
+        //     const sellerProducts = await productCollection.find(query).toArray();
+        //     res.send(sellerProducts);
+        // })
+
+        app.get('/my-products',async(req,res)=>{
+            const email = req.query.email;
+            const query = {email};
+           const categories = await productCollection.find(query).toArray(); 
+           res.send(categories);
+
         })
 
 
@@ -149,7 +165,9 @@ async function run(){
         
         app.post('/users', async(req,res)=>{
             const user = req.body;
+            console.log(user);
             const result = await userCollection.insertOne(user);
+            console.log(result);
             res.send(result);
         })
 
